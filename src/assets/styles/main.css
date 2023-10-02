@@ -1,0 +1,13 @@
+@import "base";
+@import "variables/global.css";
+
+body {
+  background: var(--bg-color);
+  font: var(--font-m);
+  color: var(--primary-color);
+}
+
+#app,
+body {
+  min-height: 100vh;
+}
