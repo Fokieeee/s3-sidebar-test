@@ -2,53 +2,60 @@
 import ArrowDown from "../assets/icons/ArrowDown.vue"
 import ArrowRight from "../assets/icons/ArrowRight.vue"
 
-import { ref } from "vue"
+import { computed, ref } from "vue"
 
-const { pageList, childs } = defineProps(["pageList", "childs"])
-const childrenOpenState = ref(null)
+const { pageList, childPageKeys } = defineProps(["pageList", "childPageKeys"])
+const childrenOpenState = ref({})
 
-const initialChildrenState = {}
-for (let child of childs) {
-  initialChildrenState[child] = false
+for (const key of childPageKeys) {
+  childrenOpenState.value[key] = false
 }
-childrenOpenState.value = initialChildrenState
 
 const toggleChildren = (key) => {
   childrenOpenState.value[key] = !childrenOpenState.value[key]
 }
+
+const hasChildPages = computed(
+  () => (key) => Boolean(pageList[key].childPageKeys)
+)
+
+const isChildPageOpened = computed(
+  () => (key) => Boolean(childrenOpenState.value[key])
+)
 </script>
 
 <template>
   <ul>
     <li
-      v-for="key in childs"
+      v-for="key in childPageKeys"
       :key="key"
       @click="toggleChildren(key)"
       class="row"
     >
       <div
         class="text-container"
-        :class="{ 'has-children': pageList[key].childPageKeys }"
+        :class="{ 'has-children': hasChildPages(key) }"
       >
         <div class="icon-container">
           <ArrowDown
-            v-if="pageList[key].childPageKeys && childrenOpenState[key]"
+            v-if="hasChildPages(key) && isChildPageOpened(key)"
             class="arrow-down"
           />
           <ArrowRight
-            v-if="pageList[key].childPageKeys && !childrenOpenState[key]"
+            v-if="hasChildPages(key) && !isChildPageOpened(key)"
             class="arrow-right"
           />
         </div>
-        <p class="row-text">{{ pageList[key].name }}</p>
+        <p class="text">{{ pageList[key].name }}</p>
       </div>
 
       <PageList
         @click.stop
-        v-if="pageList[key].childPageKeys && childrenOpenState[key]"
+        v-if="hasChildPages(key) && isChildPageOpened(key)"
         :pageList="pageList"
-        :childs="pageList[key].childPageKeys"
-      />
+        :childPageKeys="pageList[key].childPageKeys"
+      >
+      </PageList>
     </li>
   </ul>
 </template>
@@ -68,7 +75,7 @@ const toggleChildren = (key) => {
   margin-left: 20px;
 }
 
-.row-text {
+.text {
   margin-left: 10px;
 }
 .icon-container {

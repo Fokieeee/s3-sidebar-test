@@ -1,19 +1,19 @@
 <script setup>
 import SideBar from "./components/SideBar.vue"
 import axios from "axios"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import PreLoader from "./components/PreLoader.vue"
 
 const isLoading = ref(true)
 const isError = ref(false)
-const pageList = ref(null)
+let pageList = null
 
 const getpageList = async () => {
   try {
     const { data } = await axios.get(
       "https://prolegomenon.s3.amazonaws.com/contents.json"
     )
-    pageList.value = data
+    pageList = data
   } catch (error) {
     console.error("Error fetching data:", error)
     isError.value = true
@@ -21,8 +21,9 @@ const getpageList = async () => {
     isLoading.value = false
   }
 }
-
-getpageList()
+onMounted(() => {
+  getpageList()
+})
 </script>
 
 <template>

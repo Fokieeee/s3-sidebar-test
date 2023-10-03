@@ -8,7 +8,7 @@ const props = defineProps(["pageList"])
   <div class="side-bar">
     <PageList
       :pageList="props.pageList.pages"
-      :childs="props.pageList.rootLevelKeys"
+      :childPageKeys="props.pageList.rootLevelKeys"
     />
   </div>
 </template>
