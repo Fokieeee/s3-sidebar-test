@@ -1,15 +1,12 @@
 <script setup>
 import PageList from "./PageList.vue"
 
-const props = defineProps(["pageList"])
+const { pageTree } = defineProps(["pageTree"])
 </script>
 
 <template>
   <div class="side-bar">
-    <PageList
-      :pageList="props.pageList.pages"
-      :childPageKeys="props.pageList.rootLevelKeys"
-    />
+    <PageList :pageTree="pageTree" />
   </div>
 </template>
 

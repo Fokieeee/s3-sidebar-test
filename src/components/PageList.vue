@@ -4,58 +4,49 @@ import ArrowRight from "../assets/icons/ArrowRight.vue"
 
 import { computed, ref } from "vue"
 
-const { pageList, childPageKeys } = defineProps(["pageList", "childPageKeys"])
-const childrenOpenState = ref({})
+const { pageTree } = defineProps(["pageTree"])
 
-for (const key of childPageKeys) {
-  childrenOpenState.value[key] = false
+const childrenOpenState = ref({})
+for (const page of pageTree) {
+  childrenOpenState.value[page.key] = false
 }
 
 const toggleChildren = (key) => {
   childrenOpenState.value[key] = !childrenOpenState.value[key]
 }
 
-const hasChildPages = computed(
-  () => (key) => Boolean(pageList[key].childPageKeys)
+const hasChildren = computed(
+  () => (page) => Boolean(page.children && page.children.length > 0)
 )
 
-const isChildPageOpened = computed(
-  () => (key) => Boolean(childrenOpenState.value[key])
-)
+const hasChildrenOpen = computed(() => (key) => childrenOpenState.value[key])
 </script>
 
 <template>
   <ul>
-    <li
-      v-for="key in childPageKeys"
-      :key="key"
-      @click="toggleChildren(key)"
-      class="row"
-    >
+    <li v-for="page in pageTree" :key="page.key" class="row">
       <div
         class="text-container"
-        :class="{ 'has-children': hasChildPages(key) }"
+        :class="{ 'has-children': hasChildren(page) }"
+        @click="toggleChildren(page.key)"
       >
         <div class="icon-container">
           <ArrowDown
-            v-if="hasChildPages(key) && isChildPageOpened(key)"
+            v-if="hasChildren(page) && hasChildrenOpen(page.key)"
             class="arrow-down"
           />
           <ArrowRight
-            v-if="hasChildPages(key) && !isChildPageOpened(key)"
+            v-if="hasChildren(page) && !hasChildrenOpen(page.key)"
             class="arrow-right"
           />
         </div>
-        <p class="text">{{ pageList[key].name }}</p>
+        <p class="text">{{ page.name }}</p>
       </div>
 
       <PageList
-        @click.stop
-        v-if="hasChildPages(key) && isChildPageOpened(key)"
-        :pageList="pageList"
-        :childPageKeys="pageList[key].childPageKeys"
-      >
-      </PageList>
+        v-if="hasChildren(page) && hasChildrenOpen(page.key)"
+        :pageTree="page.children"
+      />
     </li>
   </ul>
 </template>
